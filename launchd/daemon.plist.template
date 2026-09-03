@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>__LABEL__</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__PYTHON__</string>
+    <string>__DAEMON__</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- tmux and git live under Homebrew and claude under ~/.local/bin; launchd's default PATH has neither. -->
+    <key>PATH</key>
+    <string>__HOME__/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key>
+    <string>__HOME__</string>
+    <key>SHELL</key>
+    <string>/bin/zsh</string>
+    <!-- Terminal to open when the launcher starts a session and nothing is attached to tmux.
+         Auto-detected (Ghostty, iTerm, then Terminal) when unset. Setting it also makes the
+         terminal come frontmost whenever you select a session from the pad.
+    <key>CLAUDE_MACROPAD_TERMINAL_APP</key>
+    <string>Ghostty</string>
+    -->
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HOME__/Library/Logs/claude-macropad.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HOME__/Library/Logs/claude-macropad.log</string>
+</dict>
+</plist>
