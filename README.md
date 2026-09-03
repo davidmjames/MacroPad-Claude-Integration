@@ -23,7 +23,7 @@ right session, model and permission-mode keys, and a usage gauge.
 ```
 
 * **Colors** are picked for deuteranopia: blue, yellow, red and white only, and red and green never appear together. Blue is Claude's move, yellow is your move (finished, waiting for a prompt), red blinking is blocked on you (a permission prompt), dim white is idle. On the model and mode rows, blue marks the selected session's current model and mode; the usage key runs white, yellow, red as the five-hour window fills. If yellow reads too close to red on your LEDs, raise the green channel in `YELLOW` at the top of the daemon.
-* **Agent key**: select that session and switch tmux to its window.
+* **Agent key**: select that session, switch tmux to its pane, and bring the terminal app to the front if another app has focus. The encoder click does the same; encoder turns switch panes inside tmux only, so you can spin through sessions on the OLED without leaving the app you're in. `CLAUDE_MACROPAD_ACTIVATE=0` in the plist turns the app switching off.
 * **Encoder turn**: select the previous or next session; tmux follows once the knob settles, so a quick spin doesn't flip through every pane. **Encoder click**: if the selected session is blinking red, press Enter to accept its permission prompt. Otherwise it just re-focuses the pane.
 * **Model keys** type `/model sonnet|opus|fable` into the selected session. Note `/model` also saves that choice as the default for new sessions. The key matching the session's current model is lit blue.
 * **Mode keys**: plan sends `/plan`; manual and auto cycle Shift+Tab from the mode the last hook reported, in Claude Code's order (manual, accept edits, plan, auto). The daemon can't see a Shift+Tab you press by hand between hook events, so if a mode key lands one step off, press it again. The key matching the current mode is lit blue.
@@ -123,7 +123,8 @@ The daemon prints the 12-key color grid and OLED lines whenever they change. Pas
 
 * `boot.py` changes need a hard reset (unplug), not Ctrl-D.
 * Option+O for fast mode reaches Claude Code as `ESC o` via tmux, which is what Claude Code expects; no terminal Option-as-Meta setting is involved.
-* Push-to-talk is available but off: set `PTT_KEY = 11` in the firmware to make key 12 hold Space (Claude Code voice dictation) as a real HID keystroke. Set `CLAUDE_MACROPAD_TERMINAL_APP` (in the plist) to your terminal's app name and selecting a session will also bring that app frontmost.
+* Push-to-talk is available but off: set `PTT_KEY = 11` in the firmware to make key 12 hold Space (Claude Code voice dictation) as a real HID keystroke.
+* Bringing the terminal frontmost activates the whole app, so with several Ghostty windows open the most recently used one comes forward, which may not be the tmux one. Ghostty has no window-level scripting to target it without Accessibility permissions.
 * The launcher runs `claude` through a login shell, so it is found on your PATH even though launchd started tmux. The window stays open after Claude exits so you can read its last output.
 * If your hooks aren't installed yet, a launched session won't register, and the launcher will still be showing. Run `scripts/install_hooks.py` first.
 * No Bluetooth: the RP2040 has none. No joystick: the pad has none. The Codex Micro has both; the MacroPad has a screen instead.

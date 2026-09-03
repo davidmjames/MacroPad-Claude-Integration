@@ -64,6 +64,10 @@ PROJECTS_FILE = os.environ.get("CLAUDE_MACROPAD_PROJECTS", os.path.join(HOME, ".
 # Terminal used to attach when nothing is attached to tmux yet: "Ghostty", "iTerm" or "Terminal".
 # Auto-detected from /Applications when unset.
 TERMINAL_APP = os.environ.get("CLAUDE_MACROPAD_TERMINAL_APP")
+# Bring the terminal app frontmost when an agent key or the encoder click focuses a session.
+# Encoder turns never do, so you can spin through sessions on the OLED from another app.
+# Set CLAUDE_MACROPAD_ACTIVATE=0 to disable.
+ACTIVATE_TERMINAL = os.environ.get("CLAUDE_MACROPAD_ACTIVATE", "1") != "0"
 SHELL = os.environ.get("SHELL", "/bin/zsh")
 TMUX_SESSION = "claude"       # tmux session the launcher creates panes/windows in
 # True: each new agent is a pane split to the right of the existing agents in the same window,
@@ -176,7 +180,7 @@ def tmux_clients():
     return r.stdout.split() if tmux_ok(r) else []
 
 
-def tmux_focus(pane):
+def tmux_focus(pane, activate=False):
     r = tmux("display-message", "-p", "-t", pane, "#{session_name}")
     if not tmux_ok(r):
         return False
@@ -185,7 +189,8 @@ def tmux_focus(pane):
         tmux("switch-client", "-c", client, "-t", session_name)
     tmux("select-window", "-t", pane)
     tmux("select-pane", "-t", pane)
-    activate_terminal()
+    if activate:
+        activate_terminal()
     return True
 
 
@@ -237,7 +242,7 @@ def tmux_launch(cwd, near=None, command="claude"):
     pane = r.stdout.strip()
     log.info("launched claude in %s (%s)", cwd, pane)
     if tmux_clients():
-        tmux_focus(pane)
+        tmux_focus(pane, activate=True)
     else:
         open_terminal_attached()
     return pane
@@ -259,7 +264,7 @@ def _osascript(script):
 
 
 def activate_terminal():
-    if TERMINAL_APP or os.environ.get("CLAUDE_MACROPAD_ACTIVATE"):
+    if ACTIVATE_TERMINAL:
         _osascript('tell application "%s" to activate' % terminal_app())
 
 
@@ -517,7 +522,7 @@ class Board:
             else:
                 return
         if pane:
-            threading.Thread(target=tmux_focus, args=(pane,), daemon=True).start()
+            threading.Thread(target=tmux_focus, args=(pane, True), daemon=True).start()
 
     def _tokens_for(self, n, s):
         if n in MODEL_KEYS:
@@ -599,7 +604,7 @@ class Board:
                 log.info("approve -> %s (%s)", s.name, pane)
         if pane:
             def go():
-                tmux_focus(pane)
+                tmux_focus(pane, activate=True)
                 if approve:
                     tmux_send(pane, ["Enter"])
             threading.Thread(target=go, daemon=True).start()

@@ -18,11 +18,13 @@
     <string>__HOME__</string>
     <key>SHELL</key>
     <string>/bin/zsh</string>
-    <!-- Terminal to open when the launcher starts a session and nothing is attached to tmux.
-         Auto-detected (Ghostty, iTerm, then Terminal) when unset. Setting it also makes the
-         terminal come frontmost whenever you select a session from the pad.
+    <!-- Terminal app to open or bring frontmost. Auto-detected (Ghostty, iTerm, then Terminal)
+         when unset. Agent keys and the encoder click bring it frontmost; set
+         CLAUDE_MACROPAD_ACTIVATE to 0 to keep pad presses from changing the active app.
     <key>CLAUDE_MACROPAD_TERMINAL_APP</key>
     <string>Ghostty</string>
+    <key>CLAUDE_MACROPAD_ACTIVATE</key>
+    <string>0</string>
     -->
   </dict>
   <key>RunAtLoad</key>
